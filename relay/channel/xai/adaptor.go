@@ -27,7 +27,15 @@ func (a *Adaptor) ConvertAudioRequest(c *gin.Context, info *relaycommon.RelayInf
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	request.Size = ""
+	if request.Size == "" {
+		return nil, errors.New("size parameter is required")
+	}
+	if request.Quality == "" {
+		return nil, errors.New("quality parameter is required")
+	}
+	if request.Style == "" {
+		return nil, errors.New("style parameter is required")
+	}
 	return request, nil
 }
 
