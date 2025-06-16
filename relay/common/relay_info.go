@@ -48,6 +48,7 @@ type BuildInToolInfo struct {
 	ToolName          string
 	CallCount         int
 	SearchContextSize string
+	PartialImages     uint // For image generation tools
 }
 
 type ResponsesUsageInfo struct {
@@ -168,6 +169,12 @@ func GenRelayInfoResponses(c *gin.Context, req *dto.OpenAIResponsesRequest) *Rel
 					tool.SearchContextSize = "medium"
 				}
 				info.ResponsesUsageInfo.BuiltInTools[tool.Type].SearchContextSize = tool.SearchContextSize
+			case dto.BuildInToolImageGeneration:
+				// Handle image generation tool parameters
+				// Store partial_images setting if needed
+				if tool.PartialImages > 0 {
+					info.ResponsesUsageInfo.BuiltInTools[tool.Type].PartialImages = tool.PartialImages
+				}
 			}
 		}
 	}

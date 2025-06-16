@@ -240,15 +240,19 @@ type ResponsesOutputContent struct {
 const (
 	BuildInToolWebSearchPreview = "web_search_preview"
 	BuildInToolFileSearch       = "file_search"
+	BuildInToolImageGeneration  = "image_generation"
 )
 
 const (
-	BuildInCallWebSearchCall = "web_search_call"
+	BuildInCallWebSearchCall   = "web_search_call"
+	BuildInCallImageGeneration = "image_generation_call"
 )
 
 const (
-	ResponsesOutputTypeItemAdded = "response.output_item.added"
-	ResponsesOutputTypeItemDone  = "response.output_item.done"
+	ResponsesOutputTypeItemAdded      = "response.output_item.added"
+	ResponsesOutputTypeItemDone       = "response.output_item.done"
+	ResponsesImageGenerationPartial   = "response.image_generation_call.partial_image"
+	ResponsesImageGenerationCompleted = "response.image_generation_call.completed"
 )
 
 // ResponsesStreamResponse 用于处理 /v1/responses 流式响应
@@ -257,4 +261,15 @@ type ResponsesStreamResponse struct {
 	Response *OpenAIResponsesResponse `json:"response,omitempty"`
 	Delta    string                   `json:"delta,omitempty"`
 	Item     *ResponsesOutput         `json:"item,omitempty"`
+	// Image generation specific fields
+	PartialImageIndex *int             `json:"partial_image_index,omitempty"`
+	PartialImageB64   string           `json:"partial_image_b64,omitempty"`
+	ImageGenerationID string           `json:"image_generation_id,omitempty"`
+	CompletedImages   []GeneratedImage `json:"completed_images,omitempty"`
+}
+
+// GeneratedImage represents a completed generated image
+type GeneratedImage struct {
+	ImageB64 string `json:"image_b64"`
+	Index    int    `json:"index"`
 }

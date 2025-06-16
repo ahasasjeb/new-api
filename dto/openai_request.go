@@ -642,4 +642,6 @@ type ResponsesToolsCall struct {
 	Name        string          `json:"name,omitempty"`
 	Description string          `json:"description,omitempty"`
 	Parameters  json.RawMessage `json:"parameters,omitempty"`
+	// Image Generation
+	PartialImages uint `json:"partial_images,omitempty"`
 }

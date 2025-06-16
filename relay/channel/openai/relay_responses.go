@@ -64,7 +64,9 @@ func OaiResponsesHandler(c *gin.Context, resp *http.Response, info *relaycommon.
 	usage.TotalTokens = responsesResponse.Usage.TotalTokens
 	// 解析 Tools 用量
 	for _, tool := range responsesResponse.Tools {
-		info.ResponsesUsageInfo.BuiltInTools[tool.Type].CallCount++
+		if toolInfo, exists := info.ResponsesUsageInfo.BuiltInTools[tool.Type]; exists {
+			toolInfo.CallCount++
+		}
 	}
 	return nil, &usage
 }
@@ -92,12 +94,24 @@ func OaiResponsesStreamHandler(c *gin.Context, resp *http.Response, info *relayc
 			case "response.output_text.delta":
 				// 处理输出文本
 				responseTextBuilder.WriteString(streamResponse.Delta)
+			case dto.ResponsesImageGenerationPartial:
+				// 处理图像生成部分图像事件
+				// 这里可以添加特定的处理逻辑，比如记录或转发部分图像
+			case dto.ResponsesImageGenerationCompleted:
+				// 处理图像生成完成事件
+				if len(info.ResponsesUsageInfo.BuiltInTools) > 0 {
+					if toolInfo, exists := info.ResponsesUsageInfo.BuiltInTools[dto.BuildInToolImageGeneration]; exists {
+						toolInfo.CallCount++
+					}
+				}
 			case dto.ResponsesOutputTypeItemDone:
 				// 函数调用处理
 				if streamResponse.Item != nil {
 					switch streamResponse.Item.Type {
 					case dto.BuildInCallWebSearchCall:
 						info.ResponsesUsageInfo.BuiltInTools[dto.BuildInToolWebSearchPreview].CallCount++
+					case dto.BuildInCallImageGeneration:
+						info.ResponsesUsageInfo.BuiltInTools[dto.BuildInToolImageGeneration].CallCount++
 					}
 				}
 			}
